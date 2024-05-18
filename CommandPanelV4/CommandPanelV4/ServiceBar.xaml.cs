@@ -72,7 +72,7 @@ namespace CommandPanelV4
         {
             ServiceObj context = DataContext as ServiceObj;
             ServiceController sc = new ServiceController(ServiceName);
-            if (sc != null)
+            if (sc != null && sc.Status==ServiceControllerStatus.Stopped)
             {
                 //Note: this requires run as admin 
                 //TODO maybe prevent this using this https://stackoverflow.com/questions/1913429/servicecontroller-permissions ?
@@ -91,16 +91,44 @@ namespace CommandPanelV4
 
         private void StopServiceButton_Click(object sender, RoutedEventArgs e)
         {
-            Process? monitoredProcess = Process.GetProcessesByName(ServiceName).FirstOrDefault();
-            if (monitoredProcess != null)
+            ServiceObj context = DataContext as ServiceObj;
+            ServiceController sc = new ServiceController(ServiceName);
+            if (sc != null && sc.Status == ServiceControllerStatus.Running)
             {
-                monitoredProcess.Kill();
+                try
+                {
+                    sc.Stop();
+                }
+                catch (InvalidOperationException op)
+                {
+                    MessageBox.Show($"Cannot stop service {ServiceName}. Restart this application as an admin!");
+                }
+
             }
         }
 
         private void RestartServiceButton_Click(object sender, RoutedEventArgs e)
         {
+            ServiceObj context = DataContext as ServiceObj;
+            ServiceController sc = new ServiceController(ServiceName);
+            if (sc != null)
+            {
+                try
+                {
+                    //TODO get this off the UI thread
+                    if (sc.Status == ServiceControllerStatus.Running)
+                    {
+                        sc.Stop();
+                        sc.WaitForStatus(ServiceControllerStatus.Stopped);
+                    }
+                    sc.Start();
+                }
+                catch (InvalidOperationException op)
+                {
+                    MessageBox.Show($"Cannot stop service {ServiceName}. Restart this application as an admin!");
+                }
 
+            }
         }
     }
 }
