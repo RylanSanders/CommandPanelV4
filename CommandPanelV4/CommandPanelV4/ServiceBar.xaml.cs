@@ -89,6 +89,23 @@ namespace CommandPanelV4
             }
         }
 
+        private void RestartService(ServiceController svcController)
+        {
+            try
+            {
+                if (svcController.Status == ServiceControllerStatus.Running)
+                {
+                    svcController.Stop();
+                    svcController.WaitForStatus(ServiceControllerStatus.Stopped);
+                }
+                svcController.Start();
+            }
+            catch (InvalidOperationException op)
+            {
+                MessageBox.Show($"Cannot stop service {ServiceName}. Restart this application as an admin!");
+            }
+        }
+
         private void StopServiceButton_Click(object sender, RoutedEventArgs e)
         {
             ServiceObj context = DataContext as ServiceObj;
@@ -113,20 +130,7 @@ namespace CommandPanelV4
             ServiceController sc = new ServiceController(ServiceName);
             if (sc != null)
             {
-                try
-                {
-                    //TODO get this off the UI thread
-                    if (sc.Status == ServiceControllerStatus.Running)
-                    {
-                        sc.Stop();
-                        sc.WaitForStatus(ServiceControllerStatus.Stopped);
-                    }
-                    sc.Start();
-                }
-                catch (InvalidOperationException op)
-                {
-                    MessageBox.Show($"Cannot stop service {ServiceName}. Restart this application as an admin!");
-                }
+                Task.Run(() => RestartService(sc));
 
             }
         }
