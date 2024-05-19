@@ -6,11 +6,33 @@
         xmlns:local="clr-namespace:CommandPanelV4"
         mc:Ignorable="d"
         Title="Command Panel" Height="450" Width="800">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ResourceDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <ListView x:Name="ServicesListView">
+            <ListView.Resources>
+                <Style x:Key="InstalledStyle" TargetType="{x:Type local:ServiceBar}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsInstalled, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" Value="False">
+                            <Setter Property="IsEnabled" Value="False"/>
+                            <Setter Property="Background" Value="{StaticResource UnenabledGrayBrush}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.Resources>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Focusable" Value="false"/>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                   <local:ServiceBar ServiceName="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsHitTestVisible="True" />
+                   <local:ServiceBar Style="{StaticResource InstalledStyle}" ServiceName="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsHitTestVisible="True" />
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

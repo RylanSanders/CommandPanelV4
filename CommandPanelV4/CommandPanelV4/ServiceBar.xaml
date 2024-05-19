@@ -17,13 +17,13 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="40"/>
             <ColumnDefinition/>
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <TextBlock x:Name="ServiceNameTextBlock" Text="{Binding Path=ServiceName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:ServiceBar}}}" VerticalAlignment="Center" Foreground="{DynamicResource MaterialDesignDarkForeground}"/>
-        <materialDesign:PackIcon x:Name="StatusPackIcon" HorizontalAlignment="Left" Margin="5"  VerticalAlignment="Center" Grid.Column="1" Width="24" Height="24" Kind="Add" />
+        <materialDesign:PackIcon x:Name="StatusPackIcon" Focusable="True" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1" Width="32" Height="32" Kind="Add" />
         <Button x:Name="StartServiceButton" Click="StartServiceButton_Click" Grid.Column="2" Width="40" Padding="0,0,0,0" Margin="1" Style="{StaticResource GreenPurpleHoverButton}">
             <materialDesign:PackIcon Width="24" Height="24" Kind="PlayArrow" />
         </Button>

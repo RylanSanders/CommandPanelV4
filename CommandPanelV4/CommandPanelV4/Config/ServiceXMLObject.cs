@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommandPanelV4.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,5 +12,8 @@ namespace CommandPanelV4.Config
     {
         [XmlAttribute]
         public string Name { get; set; }
+
+        [XmlIgnore]
+        public bool IsInstalled { get { return SvcUtil.IsServiceInstalled(Name); } }
     }
 }

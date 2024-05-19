@@ -17,6 +17,7 @@
     <Color x:Key="DarkButtonBackgroundColor">#303030</Color>
     <Color x:Key="DarkButtonHighlightedBackgroundColor">#3D3D3D</Color>
     <SolidColorBrush x:Key="MaterialDesignDarkButtonBackgroundBrush">#B17CFF</SolidColorBrush>
+    <SolidColorBrush x:Key="UnenabledGrayBrush">#454545</SolidColorBrush>
     <SolidColorBrush x:Key="MaterialDesignDarkToolBarButtonBackgroundBrush">#303030</SolidColorBrush>
     <Style x:Key="GreenHoverButton" TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedDarkButton}">
         <Setter Property="Background" Value="{StaticResource MaterialDesignDarkBackground}">

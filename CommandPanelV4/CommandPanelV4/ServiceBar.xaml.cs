@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Media;
+using CommandPanelV4.Util;
 
 namespace CommandPanelV4
 {
@@ -21,9 +22,9 @@ namespace CommandPanelV4
         public ServiceBar()
         {
             InitializeComponent();
-
+            RefreshStatus();
             refreshTimer = new System.Timers.Timer(TIMER_REFRESH_TIME);
-
+            
             refreshTimer.Elapsed += (sender, args)=>Dispatcher.Invoke(RefreshStatus);
             refreshTimer.Start();
         }
@@ -33,7 +34,7 @@ namespace CommandPanelV4
             if (String.IsNullOrEmpty(ServiceName)) return;
             ServiceXMLObject context=  DataContext as ServiceXMLObject;
             ServiceController sc = new ServiceController(ServiceName);
-            if (IsServiceInstalled(ServiceName))
+            if (SvcUtil.IsServiceInstalled(ServiceName))
             {
                 if (sc.Status == ServiceControllerStatus.Running)
                 {
@@ -54,7 +55,9 @@ namespace CommandPanelV4
             }
             else
             {
-                //TODO
+                StatusPackIcon.Visibility = Visibility.Visible;
+                StatusPackIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.AlertOctagon;
+                StatusPackIcon.Foreground = Brushes.Red;
             }
             
         }
@@ -63,17 +66,18 @@ namespace CommandPanelV4
         public string ServiceName
         {
             get { return (string)GetValue(ServiceNameProperty); }
-            set { SetValue(ServiceNameProperty, value);}
+            set { SetValue(ServiceNameProperty, value);  }
         }
 
         public static readonly DependencyProperty ServiceNameProperty =
         DependencyProperty.Register("ServiceName", typeof(string), typeof(ServiceBar));
 
+
         private void StartServiceButton_Click(object sender, RoutedEventArgs e)
         {
             ServiceXMLObject context = DataContext as ServiceXMLObject;
             ServiceController sc = new ServiceController(ServiceName);
-            if (IsServiceInstalled(ServiceName) && sc.Status==ServiceControllerStatus.Stopped)
+            if (SvcUtil.IsServiceInstalled(ServiceName) && sc.Status==ServiceControllerStatus.Stopped)
             {
                 //Note: this requires run as admin 
                 //TODO maybe prevent this using this https://stackoverflow.com/questions/1913429/servicecontroller-permissions ?
@@ -111,7 +115,7 @@ namespace CommandPanelV4
         {
             ServiceXMLObject context = DataContext as ServiceXMLObject;
             ServiceController sc = new ServiceController(ServiceName);
-            if ( IsServiceInstalled(ServiceName) && sc.Status == ServiceControllerStatus.Running)
+            if (SvcUtil.IsServiceInstalled(ServiceName) && sc.Status == ServiceControllerStatus.Running)
             {
                 try
                 {
@@ -129,34 +133,12 @@ namespace CommandPanelV4
         {
             ServiceXMLObject context = DataContext as ServiceXMLObject;
             ServiceController sc = new ServiceController(ServiceName);
-            if (IsServiceInstalled(ServiceName) )
+            if (SvcUtil.IsServiceInstalled(ServiceName) )
             {
                 Task.Run(() => RestartService(sc));
 
             }
         }
 
-        bool IsServiceInstalled(string serviceName)
-        {
-            try
-            {
-                using (ServiceController serviceController = new ServiceController(serviceName))
-                {
-                    // Attempt to access the Status property to validate the service existence
-                    ServiceControllerStatus status = serviceController.Status;
-                    return true;
-                }
-            }
-            catch (InvalidOperationException)
-            {
-                // This exception is thrown if the service is not found
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return false;
-            }
-        }
     }
 }
