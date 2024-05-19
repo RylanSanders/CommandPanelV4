@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using CommandPanelV4.Config;
+using System.Diagnostics;
 using System.ServiceProcess;
 using System.Timers;
 using System.Windows;
@@ -29,14 +30,10 @@ namespace CommandPanelV4
 
         private void RefreshStatus() 
         {
-            //Process? monitoredProcess = Process.GetProcessesByName(localStringName).FirstOrDefault();
-            //if (monitoredProcess != null)
-            //{
-            //    Console.WriteLine("test");
-            //}
-            ServiceObj context=  DataContext as ServiceObj;
+            if (String.IsNullOrEmpty(ServiceName)) return;
+            ServiceXMLObject context=  DataContext as ServiceXMLObject;
             ServiceController sc = new ServiceController(ServiceName);
-            if (sc != null)
+            if (IsServiceInstalled(ServiceName))
             {
                 if (sc.Status == ServiceControllerStatus.Running)
                 {
@@ -55,6 +52,10 @@ namespace CommandPanelV4
                     StatusPackIcon.Visibility = Visibility.Hidden;
                 }
             }
+            else
+            {
+                //TODO
+            }
             
         }
 
@@ -70,9 +71,9 @@ namespace CommandPanelV4
 
         private void StartServiceButton_Click(object sender, RoutedEventArgs e)
         {
-            ServiceObj context = DataContext as ServiceObj;
+            ServiceXMLObject context = DataContext as ServiceXMLObject;
             ServiceController sc = new ServiceController(ServiceName);
-            if (sc != null && sc.Status==ServiceControllerStatus.Stopped)
+            if (IsServiceInstalled(ServiceName) && sc.Status==ServiceControllerStatus.Stopped)
             {
                 //Note: this requires run as admin 
                 //TODO maybe prevent this using this https://stackoverflow.com/questions/1913429/servicecontroller-permissions ?
@@ -108,9 +109,9 @@ namespace CommandPanelV4
 
         private void StopServiceButton_Click(object sender, RoutedEventArgs e)
         {
-            ServiceObj context = DataContext as ServiceObj;
+            ServiceXMLObject context = DataContext as ServiceXMLObject;
             ServiceController sc = new ServiceController(ServiceName);
-            if (sc != null && sc.Status == ServiceControllerStatus.Running)
+            if ( IsServiceInstalled(ServiceName) && sc.Status == ServiceControllerStatus.Running)
             {
                 try
                 {
@@ -126,12 +127,35 @@ namespace CommandPanelV4
 
         private void RestartServiceButton_Click(object sender, RoutedEventArgs e)
         {
-            ServiceObj context = DataContext as ServiceObj;
+            ServiceXMLObject context = DataContext as ServiceXMLObject;
             ServiceController sc = new ServiceController(ServiceName);
-            if (sc != null)
+            if (IsServiceInstalled(ServiceName) )
             {
                 Task.Run(() => RestartService(sc));
 
+            }
+        }
+
+        bool IsServiceInstalled(string serviceName)
+        {
+            try
+            {
+                using (ServiceController serviceController = new ServiceController(serviceName))
+                {
+                    // Attempt to access the Status property to validate the service existence
+                    ServiceControllerStatus status = serviceController.Status;
+                    return true;
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                // This exception is thrown if the service is not found
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return false;
             }
         }
     }

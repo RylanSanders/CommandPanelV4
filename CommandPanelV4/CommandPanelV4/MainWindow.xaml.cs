@@ -1,4 +1,5 @@
-﻿using CommandPanelV4.Util;
+﻿using CommandPanelV4.Config;
+using CommandPanelV4.Util;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
@@ -18,16 +19,16 @@ namespace CommandPanelV4
     /// </summary>
     public partial class MainWindow : Window
     {
-        ObservableCollection<ServiceObj> ServicesCollection = new ObservableCollection<ServiceObj>();
+        ObservableCollection<ServiceXMLObject> ServicesCollection = new ObservableCollection<ServiceXMLObject>();
         public MainWindow()
         {
             InitializeComponent();
-            ServicesCollection = new ObservableCollection<ServiceObj>();
+            ServicesCollection = new ObservableCollection<ServiceXMLObject>();
             ServicesListView.ItemsSource = ServicesCollection;
 
             WindowUtil.ApplyDarkWindowStyle(this);
 
-            ServicesCollection.Add(new ServiceObj() { Name = "XboxGipSvc" });
+            ConfigUtil.GetConfig().Services.ForEach(svc => ServicesCollection.Add(svc));
         }
     }
 }

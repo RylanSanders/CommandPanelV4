@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
-namespace CommandPanelV4
+namespace CommandPanelV4.Config
 {
-    class ServiceObj
+    public class ServiceXMLObject
     {
+        [XmlAttribute]
         public string Name { get; set; }
     }
 }
